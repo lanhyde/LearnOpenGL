@@ -14,6 +14,7 @@ public:
 
 	GLuint GetProjectionLocation();
 	GLuint GetModelLocation();
+	GLuint GetViewLocation();
 	void UseShader();
 	void ClearShader();
 
@@ -22,6 +23,7 @@ private:
 	GLuint shaderID;
 	GLuint uniformProjection;
 	GLuint uniformModel;
+	GLuint uniformView;
 #pragma endregion
 
 #pragma region Private Methods
