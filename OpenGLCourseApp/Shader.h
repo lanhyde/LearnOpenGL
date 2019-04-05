@@ -15,6 +15,8 @@ public:
 	GLuint GetProjectionLocation();
 	GLuint GetModelLocation();
 	GLuint GetViewLocation();
+	GLuint GetAmbientIntensityLocation();
+	GLuint GetAmbientColorLocation();
 	void UseShader();
 	void ClearShader();
 
@@ -24,6 +26,8 @@ private:
 	GLuint uniformProjection;
 	GLuint uniformModel;
 	GLuint uniformView;
+	GLuint uniformAmbientIntensity;
+	GLuint uniformAmbientColor;
 #pragma endregion
 
 #pragma region Private Methods
