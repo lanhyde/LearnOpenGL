@@ -1,6 +1,5 @@
 // OpenGLCourseApp.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
 #include "pch.h"
 #include <iostream>
 #include <vector>
@@ -8,6 +7,7 @@
 #include "Shader.h"
 #include "Window.h"
 #include "Camera.h"
+#include "Texture.h"
 
 using namespace std;
 
@@ -17,6 +17,11 @@ Window mainWindow;
 Camera camera;
 vector<Mesh*> meshList;
 vector<Shader> shaderList;
+Texture brickTexture;
+Texture dirtTexture;
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;
 
 // Vertex Shader
 static const char* vShader = "Shaders/shader.vert";
@@ -32,18 +37,19 @@ void CreateObjects()
 		0, 1, 2
 	};
 	GLfloat vertices[] = {
-		-1.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 1.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
+		// x     y        z       u      v
+		-1.0f, -1.0f, 0.0f, 0.0f,  0.0f,
+		0.0f, -1.0f, 1.0f,  0.5f, 0.0f,
+		1.0f, -1.0f, 0.0f,  1.0f,  0.0f,
+		0.0f, 1.0f, 0.0f ,  0.5f, 1.0f
 	};
 
 	Mesh* mesh = new Mesh();
-	mesh->CreateMesh(vertices, indices, sizeof(indices) / sizeof(*indices), sizeof(vertices) / sizeof(*vertices));
+	mesh->CreateMesh(vertices, indices, 20, sizeof(vertices) / sizeof(*vertices));
 	meshList.push_back(mesh);	
 	
 	Mesh* mesh2 = new Mesh();
-	mesh2->CreateMesh(vertices, indices, sizeof(indices) / sizeof(*indices), sizeof(vertices) / sizeof(*vertices));
+	mesh2->CreateMesh(vertices, indices, 20, sizeof(vertices) / sizeof(*vertices));
 	meshList.push_back(mesh2);
 }
 
@@ -62,7 +68,12 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 0.01f, 1.0f);
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.5f);
+	brickTexture = Texture("Textures/brick.png");
+	brickTexture.LoadTexture();
+	dirtTexture = Texture("Textures/dirt.png");
+	dirtTexture.LoadTexture();
+
 	GLuint uniformProjection = 0;
 	GLuint uniformModel = 0;
 	GLuint uniformView = 0;
@@ -71,9 +82,13 @@ int main()
 	// Loop until window closed
 	while (!mainWindow.ShouldClose())
 	{
+		const GLfloat currentTime = glfwGetTime(); // SDL_GetPerformanceCounter();
+		deltaTime = currentTime - lastTime; // (currentTime - lastTime) * 1000 / SDL_GetPerformanceFrequency();
+		lastTime = currentTime;
 		// Get + Handle user input events
 		glfwPollEvents();
-		camera.KeyControl(mainWindow.GetKeys());
+		camera.KeyControl(mainWindow.GetKeys(), deltaTime);
+		camera.MouseControl(mainWindow.GetXChange(), mainWindow.GetYChange());
 		// Clear window
 		glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -90,12 +105,14 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.CalculateViewMatrix()));
+		brickTexture.UseTexture();
 		meshList[0]->RenderMesh();
 
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.5f));
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		dirtTexture.UseTexture();
 		meshList[1]->RenderMesh();
 
 

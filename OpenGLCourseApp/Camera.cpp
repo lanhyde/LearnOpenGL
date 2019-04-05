@@ -31,23 +31,23 @@ void Camera::Update()
 	up = glm::normalize(glm::cross(right, front));
 }
 
-void Camera::KeyControl(bool* keys)
+void Camera::KeyControl(bool* keys, GLfloat deltaTime)
 {
 	if(keys[GLFW_KEY_W])
 	{
-		position += front * movementSpeed;
+		position += front * movementSpeed * deltaTime;
 	}
 	if(keys[GLFW_KEY_S])
 	{
-		position -= front * movementSpeed;
+		position -= front * movementSpeed * deltaTime;
 	}
 	if(keys[GLFW_KEY_A])
 	{
-		position -= right * movementSpeed;
+		position -= right * movementSpeed * deltaTime;
 	}
 	if(keys[GLFW_KEY_D])
 	{
-		position += right * movementSpeed;
+		position += right * movementSpeed * deltaTime;
 	}
 }
 
@@ -55,6 +55,27 @@ glm::mat4 Camera::CalculateViewMatrix()
 {
 	return glm::lookAt(position, position + front, up);
 }
+
+void Camera::MouseControl(GLfloat deltaX, GLfloat deltaY)
+{
+	deltaX *= turnSpeed;
+	deltaY *= turnSpeed;
+
+	yaw += deltaX;
+	pitch += deltaY;
+
+	if(pitch > 89.0f)
+	{
+		pitch = 89.0f;
+	}
+	if(pitch < -89.0f)
+	{
+		pitch = -89.0f;
+	}
+
+	Update();
+}
+
 
 
 Camera::~Camera()

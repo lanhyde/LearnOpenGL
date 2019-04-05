@@ -125,14 +125,14 @@ GLfloat Window::GetXChange()
 {
 	GLfloat theChange = xChange;
 	xChange = 0.0f;
-	return xChange;
+	return theChange;
 }
 
 GLfloat Window::GetYChange()
 {
 	GLfloat theChange = yChange;
 	yChange = 0.0f;
-	return yChange;
+	return theChange;
 }
 
 
